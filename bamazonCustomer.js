@@ -48,15 +48,28 @@ function start() {
                 }
             }
             // check if store has enough quantity
-            if (chosenItem.stock_quantity === 0) {
-                return console.log("Sorry, insufficient quantity!");
+            if (chosenItem.stock_quantity < answer.quantity) {
+                console.log("Sorry, insufficient quantity!");
+                start();
             } else {
                 console.log("Great! We'll get that set up for you.");
-                // if enough, update database to reflect remaining quantity
 
-                // after update, show customer total cost of purchase
+                console.log("ID: " + chosenItem.item_id);
+                
+                // if enough, update database to reflect remaining quantity
+                sellInventory(chosenItem.item_id, parseInt(answer.quantity), parseFloat(chosenItem.price));
             }
 
         });
     });
+}
+
+
+function sellInventory (id, bought, price) {
+    var querySQL = "UPDATE products SET stock_quantity = stock_quantity - ? WHERE item_id = ?"
+    connection.query(querySQL, [bought,id], function(err, res){
+        // after update, show total cost of purchase by multiplying price * quantity bought
+        console.log("total: $" + (bought * price));
+        start();
+    })
 }
